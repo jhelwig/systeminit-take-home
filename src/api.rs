@@ -26,7 +26,7 @@ struct AppState {
     messages: RwLock<Vec<String>>,
 }
 
-pub fn build_router() -> Router {
+pub fn build() -> Router {
     let messages = RwLock::new(vec![]);
     let app_state = Arc::new(AppState { messages });
 

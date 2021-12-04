@@ -20,7 +20,7 @@ pub fn build() -> Router {
         )
         .nest(
             "/api",
-            api::build_router()
+            api::build()
         )
         .nest(
             "/ui",
