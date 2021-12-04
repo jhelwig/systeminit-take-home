@@ -577,6 +577,8 @@ name = "systeminit-take-home"
 version = "0.1.0"
 dependencies = [
  "axum",
+ "hyper",
+ "mime",
  "serde",
  "serde_json",
  "tokio",
