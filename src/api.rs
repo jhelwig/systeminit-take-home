@@ -30,6 +30,10 @@ pub fn build() -> Router {
     let messages = RwLock::new(vec![]);
     let app_state = Arc::new(AppState { messages });
 
+    get_router(app_state)
+}
+
+fn get_router(app_state: Arc<AppState>) -> Router {
     Router::new()
         .route("/messages", get(list_messages))
         .route("/messages", post(new_message))
