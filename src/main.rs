@@ -9,12 +9,12 @@ async fn main() {
         std::env::set_var(
             "RUST_LOG",
             "systeminit_take_home=debug,tower_http=debug",
-        )
+        );
     }
     tracing_subscriber::fmt::init();
     tracing::debug!("Logging initialized.");
 
-    let app = router::build_router();
+    let app = router::build();
 
     let bind_address = match std::env::var("BIND_ADDRESS") {
         Ok(b) => b,

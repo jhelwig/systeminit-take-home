@@ -12,7 +12,7 @@ use tower_http::{
     trace::TraceLayer,
 };
 
-pub fn build_router() -> Router {
+pub fn build() -> Router {
     Router::new()
         .route(
             "/",
