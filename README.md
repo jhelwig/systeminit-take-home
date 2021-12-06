@@ -4,12 +4,12 @@
 
 ### Rust
 
-The project has been built & tested with version 1.57.0 (also set in the
+The project has been built & tested with version `1.57.0` (also set in the
 `rust-toolchain` file for use with `rustup`).
 
 ### Node.js
 
-The project has been built & tested with version 16.13.1 (also set in the
+The project has been built & tested with version `16.13.1` (also set in the
 `.nvmrc` for use with `nvm` & compatible Node version managers).
 
 #### Yarn
