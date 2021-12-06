@@ -94,7 +94,7 @@ mod tests {
     use tower::ServiceExt;
 
     #[tokio::test]
-    async fn includes_cors_access_control_allow_origin() {
+    async fn get_includes_cors_access_control_allow_origin() {
         let app_state = Arc::new(AppState { messages: RwLock::new(VecDeque::new()) });
         let router = get_router(app_state);
 
@@ -185,7 +185,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn add_new_message() {
+    async fn post_new_message() {
         let app_state = Arc::new(AppState {messages: RwLock::new(VecDeque::new())});
         let router = get_router(app_state.clone());
 
@@ -217,7 +217,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn add_new_message_with_existing() {
+    async fn post_new_message_with_existing() {
         let mut messages = VecDeque::new();
         messages.push_front("Existing message".into());
         let app_state = Arc::new(AppState {messages: RwLock::new(messages)});
