@@ -1,6 +1,6 @@
 <template>
   <div>
-    <form class="text-center">
+    <form @submit.prevent="postMessage" class="text-center">
       <label for="message" class="mx-2">Message:</label>
       <input type="text" id="message" v-model.trim="message" />
       <button
