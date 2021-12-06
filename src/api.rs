@@ -24,18 +24,21 @@ use tower_http::cors::{
     any,
     CorsLayer,
 };
-use std::sync::{
-    Arc,
-    RwLock,
+use std::{
+    collections::VecDeque,
+    sync::{
+        Arc,
+        RwLock,
+    }
 };
 
 #[derive(Debug)]
 struct AppState {
-    messages: RwLock<Vec<String>>,
+    messages: RwLock<VecDeque<String>>,
 }
 
 pub fn build() -> Router {
-    let messages = RwLock::new(vec![]);
+    let messages = RwLock::new(VecDeque::new());
     let app_state = Arc::new(AppState { messages });
 
     get_router(app_state)
@@ -70,7 +73,7 @@ async fn new_message(
     Extension(app_state): Extension<Arc<AppState>>
 ) -> Result<Json<Value>, StatusCode> {
     match app_state.messages.write() {
-        Ok(mut m) => m.push(message),
+        Ok(mut m) => m.push_front(message),
         Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
     }
 
@@ -92,7 +95,7 @@ mod tests {
 
     #[tokio::test]
     async fn includes_cors_access_control_allow_origin() {
-        let app_state = Arc::new(AppState { messages: RwLock::new(vec![]) });
+        let app_state = Arc::new(AppState { messages: RwLock::new(VecDeque::new()) });
         let router = get_router(app_state);
 
         let response = router
@@ -137,7 +140,7 @@ mod tests {
 
     #[tokio::test]
     async fn get_no_messages() {
-        let app_state = Arc::new(AppState { messages: RwLock::new(vec![]) });
+        let app_state = Arc::new(AppState { messages: RwLock::new(VecDeque::new()) });
         let router = get_router(app_state);
 
         let response = router
@@ -155,12 +158,12 @@ mod tests {
 
     #[tokio::test]
     async fn get_some_messages() {
+        let mut messages = VecDeque::new();
+        messages.push_front("Message 1".into());
+        messages.push_front("Message 2".into());
         let app_state = Arc::new(
         AppState {
-                messages: RwLock::new(vec![
-                    "Message 1".into(),
-                    "Message 2".into()
-                ])
+                messages: RwLock::new(messages)
             }
         );
         let router = get_router(app_state);
@@ -173,8 +176,8 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
 
         let expected_body: Vec<String> = vec![
-            "Message 1".into(),
             "Message 2".into(),
+            "Message 1".into(),
         ];
         let body = hyper::body::to_bytes(response.into_body()).await.unwrap();
         let body: Value = serde_json::from_slice(&body).unwrap();
@@ -183,7 +186,7 @@ mod tests {
 
     #[tokio::test]
     async fn add_new_message() {
-        let app_state = Arc::new(AppState {messages: RwLock::new(vec![])});
+        let app_state = Arc::new(AppState {messages: RwLock::new(VecDeque::new())});
         let router = get_router(app_state.clone());
 
         let body_content = "The new message";
@@ -215,7 +218,9 @@ mod tests {
 
     #[tokio::test]
     async fn add_new_message_with_existing() {
-        let app_state = Arc::new(AppState {messages: RwLock::new(vec!["Existing message".into()])});
+        let mut messages = VecDeque::new();
+        messages.push_front("Existing message".into());
+        let app_state = Arc::new(AppState {messages: RwLock::new(messages)});
         let router = get_router(app_state.clone());
 
         let body_content = "The new message";
@@ -233,8 +238,8 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
 
         let expected_messages: Vec<String> = vec![
-            "Existing message".into(),
             "The new message".into(),
+            "Existing message".into(),
         ];
         let body = hyper::body::to_bytes(response.into_body()).await.unwrap();
         let body: Value = serde_json::from_slice(&body).unwrap();
