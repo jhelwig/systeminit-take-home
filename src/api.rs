@@ -4,7 +4,10 @@ use axum::{
         ContentLengthLimit,
         Extension,
     },
-    http::StatusCode,
+    http::{
+        Method,
+        StatusCode,
+    },
     response::Json,
     Router,
     routing::{
@@ -15,6 +18,11 @@ use axum::{
 use serde_json::{
     json,
     Value,
+};
+use tower::ServiceBuilder;
+use tower_http::cors::{
+    any,
+    CorsLayer,
 };
 use std::sync::{
     Arc,
@@ -34,10 +42,18 @@ pub fn build() -> Router {
 }
 
 fn get_router(app_state: Arc<AppState>) -> Router {
+    let cors_layer = CorsLayer::new()
+        .allow_methods(vec![Method::GET, Method::POST])
+        .allow_origin(any());
+
     Router::new()
         .route("/messages", get(list_messages))
         .route("/messages", post(new_message))
-        .layer(AddExtensionLayer::new(app_state))
+        .layer(
+            ServiceBuilder::new()
+                .layer(cors_layer)
+                .layer(AddExtensionLayer::new(app_state))
+        )
 }
 
 async fn list_messages(Extension(app_state): Extension<Arc<AppState>>) -> Result<Json<Value>, StatusCode> {
@@ -68,10 +84,56 @@ mod tests {
         body::Body,
         http::{
             self,
+            header,
             Request,
         },
     };
     use tower::ServiceExt;
+
+    #[tokio::test]
+    async fn includes_cors_access_control_allow_origin() {
+        let app_state = Arc::new(AppState { messages: RwLock::new(vec![]) });
+        let router = get_router(app_state);
+
+        let response = router
+            .oneshot(
+                Request::get("/messages")
+                    .header(header::ORIGIN, "http://example.com")
+                    .body(Body::empty())
+                    .unwrap()
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(
+            response.headers().get(header::ACCESS_CONTROL_ALLOW_ORIGIN).unwrap(),
+            "*",
+        );
+    }
+
+    #[tokio::test]
+    async fn post_includes_cors_access_control_allow_origin() {
+        let app_state = Arc::new(AppState { messages: RwLock::new(VecDeque::new()) });
+        let router = get_router(app_state);
+
+        let body_content = "The new message";
+        let response = router
+            .oneshot(
+                Request::post("/messages")
+                    .header(header::ORIGIN, "http://example.com")
+                    .header(http::header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
+                    .header(http::header::CONTENT_LENGTH, body_content.bytes().count())
+                    .body(Body::from(body_content))
+                    .unwrap()
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(
+            response.headers().get(header::ACCESS_CONTROL_ALLOW_ORIGIN).unwrap(),
+            "*",
+        );
+    }
 
     #[tokio::test]
     async fn get_no_messages() {
