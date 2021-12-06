@@ -1,17 +1,15 @@
 <template>
-  <div>
-    <form @submit.prevent="postMessage" class="text-center">
-      <label for="message" class="mx-2">Message:</label>
-      <input type="text" id="message" v-model.trim="message" />
-      <button
-        type="button"
-        class="p-1 mx-2 border-4 rounded-lg border-blue-400 bg-blue-300"
-        @click="postMessage"
-      >
-        Post
-      </button>
-    </form>
-  </div>
+  <form @submit.prevent="postMessage" class="text-center">
+    <label for="message" class="mx-2">Message:</label>
+    <input type="text" id="message" v-model.trim="message" />
+    <button
+      type="button"
+      class="p-1 mx-2 border-4 rounded-lg border-blue-400 bg-blue-300"
+      @click="postMessage"
+    >
+      Post
+    </button>
+  </form>
 </template>
 
 <script lang="ts">
