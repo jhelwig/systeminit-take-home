@@ -42,6 +42,8 @@ URL(s) it can be reached on (typically `http://localhost:8080`).
 
 The HTTP API is served on `http://127.0.0.1:8000`.
 
+The tests can be run via `cargo test`.
+
 ## "Production"
 
 The UI can be built at the same time as the API by setting the `BUILD_UI`
