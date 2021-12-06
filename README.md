@@ -59,6 +59,9 @@ by the Rust application.
 
 Requesting `/` from the Rust app, will redirect to `/ui/index.html`.
 
+When running the API with `cargo run`, and using the built-in serving of the
+Vue.js UI, `cargo run` **must** be run from the root of the repository.
+
 ## Configuration
 
 | Environment Variable | Default                                       |
