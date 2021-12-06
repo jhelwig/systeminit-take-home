@@ -3,7 +3,7 @@
     <li
       v-for="(message, index) in messages"
       :key="index"
-      class="p-4 my-2 rounded-lg bg-blue-500"
+      class="p-4 my-2 rounded-lg bg-blue-400"
     >
       <message :message="message" />
     </li>

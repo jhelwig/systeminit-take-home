@@ -5,7 +5,7 @@
       <input type="text" id="message" v-model.trim="message" />
       <button
         type="button"
-        class="p-1 mx-2 border-4 rounded-lg border-blue-500 bg-blue-300"
+        class="p-1 mx-2 border-4 rounded-lg border-blue-400 bg-blue-300"
         @click="postMessage"
       >
         Post
