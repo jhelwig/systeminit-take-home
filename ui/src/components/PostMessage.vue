@@ -24,6 +24,10 @@ export default class MessageBoard extends Vue {
 
   @Emit("message-posted")
   postMessage(): void {
+    if (this.message === "") {
+      return;
+    }
+
     axios
       .post("http://127.0.0.1:8000/api/messages", this.message)
       .then(() => {
