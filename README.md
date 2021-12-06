@@ -40,9 +40,7 @@ URL(s) it can be reached on (typically `http://localhost:8080`).
 
 ### Rust
 
-The HTTP API defaults to serving on `http://127.0.0.1:8000`, and can be changed
-by setting environment variables described in the
-[Configuration](#configuration) section.
+The HTTP API is served on `http://127.0.0.1:8000`.
 
 ## "Production"
 
@@ -54,8 +52,8 @@ env BUILD_UI=true cargo build --production
 ```
 
 This will automatically run `yarn build` in the `ui` directory, with the Vue.js
-app automatically set up to be served from `http://0.0.0.0:8000/ui/` by the
-Rust application.
+app automatically set up to be served from `http://127.0.0.1:8000/ui/index.html`
+by the Rust application.
 
 Requesting `/` from the Rust app, will redirect to `/ui/index.html`.
 
@@ -63,7 +61,4 @@ Requesting `/` from the Rust app, will redirect to `/ui/index.html`.
 
 | Environment Variable | Default                                       |
 |----------------------|-----------------------------------------------|
-| `BIND_ADDRESS`       | `127.0.0.1`                                   |
-| `BIND_PORT`          | `8000`                                        |
 | `RUST_LOG`           | `systeminit_take_home=debug,tower_http=debug` |
-

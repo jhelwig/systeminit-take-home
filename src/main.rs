@@ -16,17 +16,7 @@ async fn main() {
 
     let app = router::build();
 
-    let bind_address = match std::env::var("BIND_ADDRESS") {
-        Ok(b) => b,
-        Err(_) => "127.0.0.1".into(),
-    };
-    let bind_port = match std::env::var("BIND_PORT") {
-        Ok(p) => p,
-        Err(_) => "8000".into(),
-    };
-    let bind_string = format!("{}:{}", bind_address, bind_port);
-
-    axum::Server::bind(&bind_string.parse().unwrap())
+    axum::Server::bind(&"127.0.0.1:8000".parse().unwrap())
         .serve(app.into_make_service())
         .await
         .unwrap();
