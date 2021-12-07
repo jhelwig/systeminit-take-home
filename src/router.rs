@@ -32,3 +32,47 @@ pub fn build() -> Router {
             })
         ).layer(TraceLayer::new_for_http())
 }
+
+#[cfg(test)]
+mod tests{
+    use super::*;
+    use axum::{
+        body::Body,
+        http::{
+            self,
+            header,
+            Request,
+        },
+    };
+    use std::{
+        fs::File,
+        io::Write,
+    };
+    use tempfile::tempdir;
+    use tower::ServiceExt;
+
+    #[tokio::test]
+    async fn serve_built_ui() {
+        let temp_dir = tempdir().unwrap();
+        std::env::set_current_dir(&temp_dir.path()).unwrap();
+
+        let ui_build_dir = temp_dir.path().join("ui/dist");
+        std::fs::create_dir_all(&ui_build_dir).unwrap();
+        let mut file = File::create(ui_build_dir.join("random_file.txt")).unwrap();
+        file.write_all(b"Test content!").unwrap();
+
+        let response = build()
+            .oneshot(
+                Request::get("/ui/random_file.txt")
+                    .body(Body::empty())
+                    .unwrap()
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+
+        let body = hyper::body::to_bytes(response.into_body()).await.unwrap();
+        assert_eq!(body.as_ref(), b"Test content!");
+    }
+}
